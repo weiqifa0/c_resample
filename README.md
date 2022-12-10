@@ -1,4 +1,9 @@
 # c_resample
+======================
+
+代码来自
+
+https://www.cnblogs.com/cpuimage/
 
 # 编译
 
