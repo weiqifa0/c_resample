@@ -185,7 +185,7 @@ int nsProcess(int16_t *buffer, uint32_t sampleRate, uint64_t samplesCount, uint3
     return 1;
 }
 
-void noise_suppression(char *in_file, char *out_file) {
+void noise_suppression(char *in_file, char *out_file, enum nsLevel level) {
     //音频采样率
     uint32_t sampleRate = 0;
     uint32_t channels = 0;
@@ -196,7 +196,7 @@ void noise_suppression(char *in_file, char *out_file) {
     //如果加载成功
     if (inBuffer != nullptr) {
         double startTime = now();
-        nsProcess(inBuffer, sampleRate, inSampleCount, channels, kModerate);
+        nsProcess(inBuffer, sampleRate, inSampleCount, channels, level);
         double time_interval = calcElapsed(startTime, now());
         printf("time interval: %d ms\n ", (int) (time_interval * 1000));
 
@@ -209,8 +209,15 @@ void noise_suppression(char *in_file, char *out_file) {
 int main(int argc, char *argv[]) {
     printf("WebRtc Noise Suppression\n");
     printf("blog:http://cpuimage.cnblogs.com/\n");
-    if (argc < 2)
-        return -1;
+    enum nsLevel level;
+    if (argc < 2) {
+      return -1;
+    } else if(argc == 2) {
+      level = kModerate;
+    } else {
+      printf("argv[2]=%s %d\n",argv[2], atoi(argv[2]));
+      level = (enum nsLevel) atoi(argv[2]);
+    }
     char *in_file = argv[1];
     char drive[3];
     char dir[256];
@@ -219,9 +226,6 @@ int main(int argc, char *argv[]) {
     char out_file[1024];
     splitpath(in_file, drive, dir, fname, ext);
     sprintf(out_file, "%s%s%s_out%s", drive, dir, fname, ext);
-    noise_suppression(in_file, out_file);
-
-    printf("press any key to exit. \n");
-    getchar();
+    noise_suppression(in_file, out_file, level);
     return 0;
 }
